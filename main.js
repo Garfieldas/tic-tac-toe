@@ -26,9 +26,15 @@ const createPlayer = (name, score) => {
 
 const GameController = (function () {
 
-    GameBoard.setMark(0, 0, 'x')
-    GameBoard.setMark(1, 0, 'x')
-    GameBoard.setMark(2, 0, 'x')
+    const winCondition = [
+        ['x', 'x', 'x'],
+        ['', '', ''],
+        ['', '', '']
+    ]
+    let playerChoice = prompt();
+    const filtered = playerChoice.split(',');
+    const [row, column, mark] = filtered;
+    GameBoard.setMark(row, column, mark);
 
 })();
 
