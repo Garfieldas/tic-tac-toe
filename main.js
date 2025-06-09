@@ -16,8 +16,14 @@ const GameBoard = (function () {
   return { getBoard, setMark };
 })();
 
-const createPlayer = (name, score) => {
-  return { name, score };
+const createPlayer = (name, symbol) => {
+  return {
+    name,
+    symbol,
+    makeMove(row, col) {
+      GameBoard.setMark(row, col, symbol);
+    },
+  };
 };
 
 const GameController = (function () {
@@ -71,7 +77,42 @@ const GameController = (function () {
   return { checkWin };
 })();
 
-console.table(GameBoard.getBoard());
+const gameFlow = (function () {
+  const player1 = createPlayer("Player 1", "x");
+  const player2 = createPlayer("Player 2", "o");
+  const isGameOver = false;
+  currentPlayer = player1;
+  const board = GameBoard.getBoard();
 
-const round = GameController.checkWin(GameBoard.getBoard());
-console.log("Winner:", round);
+  const switchTurn = () => {
+    currentPlayer = currentPlayer === player1 ? player2 : player1;
+  };
+
+  const playTurn = (row, col) => {
+    if (isGameOver) {
+      console.log("Game over");
+      return;
+    }
+
+    if (board[row][col] !== "") {
+      console.log("cell is already taken choose another one");
+      return;
+    }
+
+  currentPlayer.makeMove(row, col);
+
+  const winner = GameController.checkWin(board);
+
+  if (winner) {
+    console.log(`${currentPlayer} wins!`);
+    isGameOver = true;
+  } else {
+    switchTurn();
+    console.log(`Next turn. Now goes ${currentPlayer}`);
+  }
+}
+
+return { playTurn };
+
+
+})();
