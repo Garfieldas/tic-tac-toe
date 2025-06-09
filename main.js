@@ -1,18 +1,19 @@
 const GameBoard = (function () {
-    
-    const board = [];
-    const row = 3;
-    const column = 3;
 
-    for (let i = 0; i < row; i++){
-        for (let j = 0; j < column; j++){
-            board.push([i, j]);
+
+    const board = [["", "", ""],
+    ["", "", ""],
+    ["", "", ""]];
+
+    const setMark = (row, column, symbol) => {
+        if (board[row][column] === ''){
+            board[row][column] = symbol;
         }
     }
 
     const getBoard = () => board;
 
-    return { getBoard };
+    return { getBoard, setMark };
 
 })();
 
@@ -25,7 +26,9 @@ const createPlayer = (name, score) => {
 
 const GameController = (function () {
 
-    
+    GameBoard.setMark(0, 0, 'x')
+    GameBoard.setMark(1, 0, 'x')
+    GameBoard.setMark(2, 0, 'x')
 
 })();
 
