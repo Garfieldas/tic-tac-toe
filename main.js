@@ -35,7 +35,7 @@ const GameController = (function () {
         board[i][0] !== "" &&
         board[i].every((cell) => cell === board[i][0])
       ) {
-        return board[i][0];
+        return true;
       }
     }
 
@@ -45,7 +45,7 @@ const GameController = (function () {
         column.push(board[i][j]);
       }
       if (column[0] !== "" && column.every((cell) => cell === column[0])) {
-        return column[0];
+        return true;
       }
     }
 
@@ -57,7 +57,7 @@ const GameController = (function () {
       mainDiagonal[0] !== "" &&
       mainDiagonal.every((cell) => cell === mainDiagonal[0])
     ) {
-      return mainDiagonal[0];
+      return true;
     }
 
     const rightDiagonal = [];
@@ -68,7 +68,7 @@ const GameController = (function () {
       rightDiagonal[0] !== "" &&
       rightDiagonal.every((cell) => cell === rightDiagonal[0])
     ) {
-      return rightDiagonal[0];
+      return true;
     }
 
     return false;
