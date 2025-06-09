@@ -71,7 +71,7 @@ const GameController = (function () {
       return rightDiagonal[0];
     }
 
-    return "no Winner";
+    return false;
   };
 
   return { checkWin };
@@ -80,12 +80,16 @@ const GameController = (function () {
 const gameFlow = (function () {
   const player1 = createPlayer("Player 1", "x");
   const player2 = createPlayer("Player 2", "o");
-  const isGameOver = false;
-  currentPlayer = player1;
+  let isGameOver = false;
+  let currentPlayer = player1;
   const board = GameBoard.getBoard();
 
   const switchTurn = () => {
     currentPlayer = currentPlayer === player1 ? player2 : player1;
+  };
+
+  const isBoardFull = () => {
+    return board.flat().every((cell) => cell !== "");
   };
 
   const playTurn = (row, col) => {
@@ -99,20 +103,36 @@ const gameFlow = (function () {
       return;
     }
 
-  currentPlayer.makeMove(row, col);
+    currentPlayer.makeMove(row, col);
+    console.table(board);
+    const winner = GameController.checkWin(board);
 
-  const winner = GameController.checkWin(board);
+    if (winner) {
+      console.log(`${currentPlayer.name} wins!`);
+      isGameOver = true;
+    } else if (isBoardFull()) {
+      isGameOver = true;
+      console.log("It's a tie");
+    } else {
+      switchTurn();
+      console.log(`Next turn. Now goes ${currentPlayer.name}`);
+    }
+  };
 
-  if (winner) {
-    console.log(`${currentPlayer} wins!`);
-    isGameOver = true;
-  } else {
-    switchTurn();
-    console.log(`Next turn. Now goes ${currentPlayer}`);
-  }
-}
+  const play = () => {
+    while (!isGameOver) {
+      let choice = prompt();
+      if (!choice) {
+        console.log('Game is cancelled');
+        break;
+      }
+      let trimmed = choice.split(",");
+      let [row, col] = trimmed.map(Number);
+      playTurn(row, col);
+    }
+  };
 
-return { playTurn };
-
-
+  return { playTurn, play };
 })();
+
+gameFlow.play();
