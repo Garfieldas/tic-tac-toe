@@ -23,15 +23,27 @@ const GameBoard = (function (boardSize = 3) {
   return { getBoard, setMark, createBoard };
 })();
 
-const createPlayer = (name, symbol) => {
-  return {
+const playerFactory = (function (){
+
+  const createPlayer = (name, symbol) => ({
     name,
     symbol,
     makeMove(row, col) {
-      GameBoard.setMark(row, col, symbol);
-    },
+      GameBoard.setMark(row,col,symbol);
+    }
+  });
+
+  const askUser = () => {
+    const name = prompt('Your name');
+    const symbol = prompt('Enter your symbol')
+    return createPlayer(name, symbol);
   };
-};
+
+  return {
+    askUser
+  }
+
+})();
 
 const GameController = (function () {
   const checkWin = (board) => {
@@ -85,8 +97,10 @@ const GameController = (function () {
 })();
 
 const gameFlow = (function () {
-  const player1 = createPlayer("Player 1", "x");
-  const player2 = createPlayer("Player 2", "o");
+
+  const player1 = playerFactory.askUser();
+  const player2 = playerFactory.askUser();
+
   let isGameOver = false;
   let currentPlayer = player1;
   GameBoard.createBoard();
@@ -144,3 +158,4 @@ const gameFlow = (function () {
 })();
 
 gameFlow.play();
+
