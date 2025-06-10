@@ -1,9 +1,16 @@
-const GameBoard = (function () {
-  const board = [
-    ["", "", ""],
-    ["", "", ""],
-    ["", "", ""],
-  ];
+const GameBoard = (function (boardSize = 3) {
+
+  const board = [];
+
+  const createBoard = () => {
+
+    for (let i = 0; i < boardSize; i++){
+      board[i] = [];
+      for (let j = 0; j < boardSize; j++){
+        board[i][j] = '';
+      }
+    }
+  }
 
   const setMark = (row, column, symbol) => {
     if (board[row][column] === "") {
@@ -13,7 +20,7 @@ const GameBoard = (function () {
 
   const getBoard = () => board;
 
-  return { getBoard, setMark };
+  return { getBoard, setMark, createBoard };
 })();
 
 const createPlayer = (name, symbol) => {
@@ -82,6 +89,7 @@ const gameFlow = (function () {
   const player2 = createPlayer("Player 2", "o");
   let isGameOver = false;
   let currentPlayer = player1;
+  GameBoard.createBoard();
   const board = GameBoard.getBoard();
 
   const switchTurn = () => {
@@ -132,7 +140,7 @@ const gameFlow = (function () {
     }
   };
 
-  return { playTurn, play };
+  return { play };
 })();
 
 gameFlow.play();
