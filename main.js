@@ -1,16 +1,14 @@
 const GameBoard = (function (boardSize = 3) {
-
   const board = [];
 
   const createBoard = () => {
-
-    for (let i = 0; i < boardSize; i++){
+    for (let i = 0; i < boardSize; i++) {
       board[i] = [];
-      for (let j = 0; j < boardSize; j++){
-        board[i][j] = '';
+      for (let j = 0; j < boardSize; j++) {
+        board[i][j] = "";
       }
     }
-  }
+  };
 
   const setMark = (row, column, symbol) => {
     if (board[row][column] === "") {
@@ -23,26 +21,24 @@ const GameBoard = (function (boardSize = 3) {
   return { getBoard, setMark, createBoard };
 })();
 
-const playerFactory = (function (){
-
+const playerFactory = (function () {
   const createPlayer = (name, symbol) => ({
     name,
     symbol,
     makeMove(row, col) {
-      GameBoard.setMark(row,col,symbol);
-    }
+      GameBoard.setMark(row, col, symbol);
+    },
   });
 
   const askUser = () => {
-    const name = prompt('Your name');
-    const symbol = prompt('Enter your symbol')
+    const name = prompt("Your name");
+    const symbol = prompt("Enter your symbol");
     return createPlayer(name, symbol);
   };
 
   return {
-    askUser
-  }
-
+    askUser,
+  };
 })();
 
 const GameController = (function () {
@@ -97,14 +93,16 @@ const GameController = (function () {
 })();
 
 const gameFlow = (function () {
-
-  const player1 = playerFactory.askUser();
-  const player2 = playerFactory.askUser();
-
+  let player1, player2, currentPlayer, board;
   let isGameOver = false;
-  let currentPlayer = player1;
-  GameBoard.createBoard();
-  const board = GameBoard.getBoard();
+
+  const setupGame = () => {
+    player1 = playerFactory.askUser();
+    player2 = playerFactory.askUser();
+    currentPlayer = player1;
+    GameBoard.createBoard();
+    board = GameBoard.getBoard();
+  };
 
   const switchTurn = () => {
     currentPlayer = currentPlayer === player1 ? player2 : player1;
@@ -145,7 +143,7 @@ const gameFlow = (function () {
     while (!isGameOver) {
       let choice = prompt();
       if (!choice) {
-        console.log('Game is cancelled');
+        console.log("Game is cancelled");
         break;
       }
       let trimmed = choice.split(",");
@@ -154,8 +152,8 @@ const gameFlow = (function () {
     }
   };
 
-  return { play };
+  return { play, setupGame };
 })();
 
+gameFlow.setupGame();
 gameFlow.play();
-
