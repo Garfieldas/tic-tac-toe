@@ -21,6 +21,7 @@ const GameBoard = (function () {
         col.textContent = '';
       })
     })
+    gameFlow.setupGame();
   }
 
   const getBoard = () => board;
