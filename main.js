@@ -1,24 +1,31 @@
-const GameBoard = (function (boardSize = 3) {
-  const board = [];
+const GameBoard = (function () {
+  let board = [];
 
   const createBoard = () => {
-    for (let i = 0; i < boardSize; i++) {
-      board[i] = [];
-      for (let j = 0; j < boardSize; j++) {
-        board[i][j] = "";
-      }
-    }
+    let gameBoard = document.querySelector("#board");
+    let cell = gameBoard.children;
+    board = [
+      [cell[0], cell[1], cell[2]],
+      [cell[3], cell[4], cell[5]],
+      [cell[6], cell[7], cell[8]],
+    ];
   };
 
   const setMark = (row, column, symbol) => {
-    if (board[row][column] === "") {
-      board[row][column] = symbol;
-    }
+    board[row][column].textContent = symbol;
   };
+
+  const reset = () => {
+    board.forEach((row) => {
+      row.forEach((col) => {
+        col.textContent = '';
+      })
+    })
+  }
 
   const getBoard = () => board;
 
-  return { getBoard, setMark, createBoard };
+  return { getBoard, setMark, createBoard, reset };
 })();
 
 const playerFactory = (function () {
@@ -30,14 +37,8 @@ const playerFactory = (function () {
     },
   });
 
-  const askUser = () => {
-    const name = prompt("Your name");
-    const symbol = prompt("Enter your symbol");
-    return createPlayer(name, symbol);
-  };
-
   return {
-    askUser,
+    createPlayer,
   };
 })();
 
@@ -47,44 +48,31 @@ const GameController = (function () {
 
     for (let i = 0; i < size; i++) {
       if (
-        board[i][0] !== "" &&
-        board[i].every((cell) => cell === board[i][0])
-      ) {
-        return true;
-      }
+        board[i][0].textContent &&
+        board[i].every((cell) => cell.textContent === board[i][0].textContent)
+      ) return true;
     }
 
     for (let j = 0; j < size; j++) {
-      let column = [];
-      for (let i = 0; i < size; i++) {
-        column.push(board[i][j]);
-      }
-      if (column[0] !== "" && column.every((cell) => cell === column[0])) {
-        return true;
-      }
+      const col = [board[0][j], board[1][j], board[2][j]];
+      if (
+        col[0].textContent &&
+        col.every((cell) => cell.textContent === col[0].textContent)
+      ) return true;
     }
 
-    let mainDiagonal = [];
-    for (let i = 0; i < size; i++) {
-      mainDiagonal.push(board[i][i]);
-    }
-    if (
-      mainDiagonal[0] !== "" &&
-      mainDiagonal.every((cell) => cell === mainDiagonal[0])
-    ) {
-      return true;
-    }
+    const diag1 = [board[0][0], board[1][1], board[2][2]];
+    const diag2 = [board[0][2], board[1][1], board[2][0]];
 
-    const rightDiagonal = [];
-    for (let i = 0; i < size; i++) {
-      rightDiagonal.push(board[i][size - i - 1]);
-    }
     if (
-      rightDiagonal[0] !== "" &&
-      rightDiagonal.every((cell) => cell === rightDiagonal[0])
-    ) {
-      return true;
-    }
+      diag1[0].textContent &&
+      diag1.every((cell) => cell.textContent === diag1[0].textContent)
+    ) return true;
+
+    if (
+      diag2[0].textContent &&
+      diag2.every((cell) => cell.textContent === diag2[0].textContent)
+    ) return true;
 
     return false;
   };
@@ -97,11 +85,13 @@ const gameFlow = (function () {
   let isGameOver = false;
 
   const setupGame = () => {
-    player1 = playerFactory.askUser();
-    player2 = playerFactory.askUser();
+    player1 = playerFactory.createPlayer("Player 1", "X");
+    player2 = playerFactory.createPlayer("Player 2", "O");
     currentPlayer = player1;
     GameBoard.createBoard();
     board = GameBoard.getBoard();
+    setupListeners();
+    isGameOver = false;
   };
 
   const switchTurn = () => {
@@ -109,51 +99,40 @@ const gameFlow = (function () {
   };
 
   const isBoardFull = () => {
-    return board.flat().every((cell) => cell !== "");
+    return board.flat().every((cell) => cell.textContent !== "");
   };
 
   const playTurn = (row, col) => {
-    if (isGameOver) {
-      console.log("Game over");
-      return;
-    }
-
-    if (board[row][col] !== "") {
-      console.log("cell is already taken choose another one");
-      return;
-    }
+    if (isGameOver || board[row][col].textContent !== "") return;
 
     currentPlayer.makeMove(row, col);
-    console.table(board);
-    const winner = GameController.checkWin(board);
 
-    if (winner) {
-      console.log(`${currentPlayer.name} wins!`);
+    if (GameController.checkWin(board)) {
+      alert(`${currentPlayer.name} wins!`);
       isGameOver = true;
     } else if (isBoardFull()) {
+      alert("It's a tie!");
       isGameOver = true;
-      console.log("It's a tie");
     } else {
       switchTurn();
-      console.log(`Next turn. Now goes ${currentPlayer.name}`);
     }
   };
 
-  const play = () => {
-    while (!isGameOver) {
-      let choice = prompt();
-      if (!choice) {
-        console.log("Game is cancelled");
-        break;
-      }
-      let trimmed = choice.split(",");
-      let [row, col] = trimmed.map(Number);
-      playTurn(row, col);
-    }
+  const setupListeners = () => {
+    board.forEach((row, i) =>
+      row.forEach((cell, j) => {
+        cell.addEventListener("click", () => playTurn(i, j));
+      })
+    );
   };
 
-  return { play, setupGame };
+  return { setupGame };
 })();
 
-gameFlow.setupGame();
-gameFlow.play();
+window.addEventListener("load", () => {
+  gameFlow.setupGame();
+  const resetBtn = document.querySelector('#restartButton');
+  resetBtn.addEventListener('click', () => {
+    GameBoard.reset();
+  })
+});
